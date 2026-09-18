@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZPD國家警政調查系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(15, 23, 42, 0.7);
+            --glass-border: rgba(56, 189, 248, 0.2);
+            --neon-blue: #38bdf8;
+            --neon-red: #f87171;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(14, 165, 233, 0.05), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(225, 29, 72, 0.05), transparent 25%);
+            color: #e2e8f0;
+            overflow-x: hidden;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-btn {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-btn:hover {
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+            border-color: rgba(56, 189, 248, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .glow-text-blue {
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .glow-text-red {
+            text-shadow: 0 0 10px rgba(248, 113, 113, 0.7);
+        }
+
+        .glitch-bg {
+            animation: bgGlitch 0.2s linear infinite;
+        }
+
+        .glitch-shake {
+            animation: boxGlitch 0.2s linear infinite;
+        }
+
+        @keyframes boxGlitch {
+            0% {
+                transform: translate(0)
+            }
+
+            20% {
+                transform: translate(-2px, 2px)
+            }
+
+            40% {
+                transform: translate(-2px, -2px)
+            }
+
+            60% {
+                transform: translate(2px, 2px)
+            }
+
+            80% {
+                transform: translate(2px, -2px)
+            }
+
+            100% {
+                transform: translate(0)
+            }
+        }
+
+        @keyframes bgGlitch {
+            0% {
+                background-color: rgba(220, 38, 38, 0.9);
+                transform: translate(0)
+            }
+
+            20% {
+                background-color: rgba(185, 28, 28, 0.9);
+                transform: translate(-2px, 2px)
+            }
+
+            40% {
+                background-color: rgba(153, 27, 27, 0.9);
+                transform: translate(-2px, -2px)
+            }
+
+            60% {
+                background-color: rgba(220, 38, 38, 0.9);
+                transform: translate(2px, 2px)
+            }
+
+            80% {
+                background-color: rgba(153, 27, 27, 0.9);
+                transform: translate(2px, -2px)
+            }
+
+            100% {
+                background-color: rgba(220, 38, 38, 0.9);
+                transform: translate(0)
+            }
+        }
+
+        .shake {
+            animation: shake 0.1s cubic-bezier(.36, .07, .19, .97) both infinite;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-10px, -5px, 0) rotate(-1deg);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(15px, 10px, 0) rotate(2deg);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-20px, -15px, 0) rotate(-2deg);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(20px, 20px, 0) rotate(1deg);
+            }
+        }
+
+        #jumpscare-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: red;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Noise_Texture.png/800px-Noise_Texture.png');
+            background-blend-mode: multiply;
+            background-size: cover;
+            background-position: center;
+            z-index: 9999;
+            display: none;
+            mix-blend-mode: difference;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        #jumpscare-bg-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 3rem;
+            font-family: monospace;
+            font-weight: bold;
+            line-height: 1;
+            overflow: hidden;
+            word-break: break-all;
+            text-transform: uppercase;
+        }
+
+        #jumpscare-warning-img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 32%;
+            max-height: 32%;
+            z-index: 10000;
+        }
+
+        /* 隱藏卷軸但可滾動 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .typing-effect {
+            border-right: 2px solid var(--neon-blue);
+            white-space: nowrap;
+            overflow: hidden;
+            animation: blink 0.75s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                border-color: transparent
+            }
+        }
+
+        .scrollbar-red::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+
+        .scrollbar-red::-webkit-scrollbar-thumb {
+            background: #881337;
+            border-radius: 4px;
+        }
+
+        .scrollbar-red::-webkit-scrollbar-thumb:hover {
+            background: #be123c;
+        }
+
+        .watermark-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='60'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' transform='rotate(30, 50, 30)' fill='rgba(153,27,27,0.5)' font-family='monospace' font-size='14px' font-weight='bold' letter-spacing='1px'%3EEVIDENCE%3C/text%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body class="text-sm">
+
+    <!-- Audio Elements -->
+    <audio id="audio-failed" src="audio/failed.mp3" preload="auto"></audio>
+    <audio id="audio-riser" src="audio/riser.mp3" preload="auto"></audio>
+    <audio id="audio-scream" src="audio/scream.mp3" preload="auto"></audio>
+
+    <!-- Jumpscare Container -->
+    <div id="jumpscare-container">
+        <div id="jumpscare-bg-text"></div>
+        <img id="jumpscare-warning-img" src="image/warning.png" alt="WARNING">
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-[#020617] bg-opacity-90 backdrop-blur-sm">
+        <div class="glass p-8 rounded-2xl w-96 flex flex-col items-center">
+            <div
+                class="w-16 h-16 rounded-full bg-slate-800 border-2 border-sky-400 flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(56,189,248,0.5)]">
+                <svg class="w-8 h-8 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4">
+                    </path>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold mb-6 text-sky-400 tracking-wider text-center">ZPD SYSTEM<br><span
+                    class="text-xs text-slate-400 uppercase">Authorized Personnel Only</span></h2>
+
+            <div class="w-full mb-4">
+                <input type="text" id="login-username" placeholder="ACCOUNT"
+                    class="w-full bg-slate-900 border border-slate-700 text-slate-200 px-4 py-2 rounded focus:outline-none focus:border-sky-500 transition-colors uppercase placeholder-slate-600">
+            </div>
+            <div class="w-full mb-6 relative">
+                <input type="password" id="login-password" placeholder="PASSWORD"
+                    class="w-full bg-slate-900 border border-slate-700 text-slate-200 px-4 py-2 rounded focus:outline-none focus:border-sky-500 transition-colors placeholder-slate-600">
+                <button id="login-eye-btn" class="absolute right-3 top-1/2 transform -translate-y-1/2 focus:outline-none text-slate-400 hover:text-slate-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                </button>
+            </div>
+            <p id="login-error" class="text-red-500 text-xs mb-4 min-h-[16px] text-center w-full"></p>
+            <button id="login-btn" onclick="attemptLogin()"
+                class="w-full glass-btn text-sky-400 font-bold py-2 rounded tracking-widest hover:text-white">LOGIN</button>
+            <p id="lockout-timer" class="text-red-500 text-sm mt-4 hidden font-mono text-center"></p>
+        </div>
+    </div>
+
+    <!-- Main Application Header -->
+    <header
+        class="glass sticky top-0 z-40 px-6 py-3 flex justify-between items-center border-b border-t-0 border-x-0 rounded-none">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg bg-sky-900/50 border border-sky-500/50 flex items-center justify-center">
+                <span class="text-sky-400 font-bold text-xl tracking-tighter">ZPD</span>
+            </div>
+            <div>
+                <h1 class="font-bold text-white tracking-wide glow-text-blue">ZPD國家警政調查系統</h1>
+                <p class="text-xs text-slate-400 font-mono">NODE-7A // ENCRYPTED CONNECTION</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="hidden md:flex flex-col items-end font-mono">
+                <span id="header-time" class="text-sky-400">00:00:00</span>
+                <span class="text-xs text-slate-400 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_5px_#22c55e]"></span>
+                    SYSTEM ONLINE
+                </span>
+            </div>
+            <div class="h-8 w-px bg-slate-700"></div>
+            <div class="flex flex-col items-end">
+                <span id="user-display-name" class="font-semibold text-slate-200">UNKNOWN</span>
+                <span id="user-display-level"
+                    class="text-xs text-rose-400 font-mono bg-rose-950/50 px-2 rounded mt-1 border border-rose-900">LEVEL
+                    0</span>
+            </div>
+            <button onclick="logout()"
+                class="ml-2 px-3 py-1 bg-rose-900/30 text-rose-400 border border-rose-800 rounded hover:bg-rose-800/50 transition-colors text-xs">登出</button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar -->
+        <aside
+            class="glass hidden md:flex flex-col w-64 border-r border-y-0 border-l-0 rounded-none shrink-0 p-4 gap-2">
+            <div class="text-xs text-slate-500 font-mono mb-2 px-2 uppercase tracking-widest">ZPD SYSTEM MENU</div>
+            <button onclick="playSound('beep-warning).mp3')"
+                class="glass-btn flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sky-400 bg-sky-900/20 border-sky-500/50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                    </path>
+                </svg>
+                系統首頁
+            </button>
+            <button onclick="playSound('horror-warning.mp3')"
+                class="glass-btn flex items-center gap-3 px-4 py-3 rounded-lg text-left text-slate-300">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+                案卷調閱系統
+            </button>
+            <button onclick="playSound('creepy-laugh-2.mp3')"
+                class="glass-btn flex items-center gap-3 px-4 py-3 rounded-lg text-left text-slate-300">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                    </path>
+                </svg>
+                法醫鑑定報告
+            </button>
+            <button onclick="playSound('creepy-laugh.mp3')"
+                class="glass-btn flex items-center gap-3 px-4 py-3 rounded-lg text-left text-slate-300">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                    </path>
+                </svg>
+                全國通緝名單
+            </button>
+
+            <div class="mt-auto px-2 pb-2">
+                <div class="h-px w-full bg-slate-800 mb-4"></div>
+                <p class="text-[10px] text-slate-600 font-mono leading-tight">
+                    ZPD SECURE MAINFRAME v4.9<br>
+                    UNAUTHORIZED ACCESS IS PROHIBITED AND WILL BE PROSECUTED.
+                </p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col overflow-y-auto p-4 md:p-6 lg:p-8 gap-6 relative">
+
+            <!-- Back Button Context -->
+            <div id="back-nav" class="hidden mb-[-10px]">
+                <button onclick="resetViews()"
+                    class="text-sky-400 hover:text-sky-300 flex items-center gap-1 font-mono text-xs transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                        </path>
+                    </svg>
+                    RETURN TO DASHBOARD
+                </button>
+            </div>
+
+            <!-- Query Section -->
+            <section id="query-section" class="glass rounded-xl p-6 relative overflow-hidden shrink-0">
+                <div
+                    class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-sky-500 to-transparent opacity-50">
+                </div>
+                <h2 class="text-xl font-semibold mb-4 text-sky-300 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    案卷查詢模組
+                </h2>
+                <div class="flex flex-col sm:flex-row gap-3 items-center w-full mt-2">
+                    <input type="text" id="case-search-input" placeholder="請輸入案件編號 (例: CASEXXXXX)"
+                        class="flex-1 w-full bg-slate-900 border border-slate-700 text-slate-200 px-4 py-3 rounded-lg focus:outline-none focus:border-sky-500 focus:shadow-[0_0_15px_rgba(56,189,248,0.3)] transition-all uppercase font-mono tracking-widest text-base">
+                    <button onclick="handleQuery()"
+                        class="glass-btn px-6 py-3 rounded-lg text-sky-400 font-bold whitespace-nowrap flex items-center justify-center tracking-widest bg-slate-800/80 hover:bg-sky-900/40">檢索
+                        DATABASE</button>
+                </div>
+                <p id="query-error" class="text-rose-400 mt-2 text-xs font-mono hidden"></p>
+            </section>
+
+            <!-- Query Result Container -->
+            <div id="query-result-container" class="hidden"></div>
+
+            <!-- Result Templates (Hidden in DOM) -->
+            <!-- Level 2 Template -->
+            <template id="tpl-result-lvl2">
+                <section class="glass rounded-xl p-6 border-slate-700 animate-[fadeIn_0.5s_ease-out]">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-slate-800 rounded-lg border border-slate-600">
+                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-slate-200">案卷名稱：5/5 樹懶公寓命案</h3>
+                            <p class="text-slate-400 mt-1 text-sm"><span class="text-sky-400">狀態：</span> 已結案 (嫌犯尼克已認罪)
+                            </p>
+
+                            <div class="mt-4 p-3 bg-rose-950/30 border border-rose-900/50 rounded flex gap-3">
+                                <svg class="w-5 h-5 text-rose-500 shrink-0 mt-0.5" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                    </path>
+                                </svg>
+                                <div>
+                                    <span class="text-rose-400 font-bold text-xs uppercase block mb-1">【警告】權限不足</span>
+                                    <p class="text-rose-300 text-xs">您的權限 Level 2 不足，無法調閱詳細卷宗與證物清單。如有疑義請向直屬長官提出調閱申請。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </template>
+
+            <!-- Level 5 Template -->
+            <template id="tpl-result-lvl5">
+                <section class="glass rounded-xl p-6 border-sky-900/50 relative animate-[fadeIn_0.5s_ease-out]">
+                    <div
+                        class="absolute top-0 right-0 px-3 py-1 bg-red-900/80 text-white text-[10px] font-bold tracking-widest rounded-bl-lg">
+                        TOP SECRET</div>
+
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="md:w-1/3 flex flex-col gap-4">
+                            <div
+                                class="aspect-video bg-slate-900 rounded-lg border border-slate-700 flex items-center justify-center relative overflow-hidden group">
+                                <div class="absolute inset-0 bg-[url('image/sloth.png')] bg-cover bg-center">
+                                </div>
+                                <div class="watermark-overlay absolute inset-0 z-10"></div>
+                            </div>
+                            <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-800">
+                                <h4 class="text-xs text-slate-500 uppercase tracking-wider mb-2">Metadata</h4>
+                                <ul class="text-xs text-slate-300 font-mono space-y-1">
+                                    <li><span class="text-slate-500">ID:</span> CASE73926481</li>
+                                    <li><span class="text-slate-500">CLASSIFICATION:</span> HOMICIDE</li>
+                                    <li><span class="text-slate-500">OFFICER:</span> HOOTZ</li>
+                                    <li><span class="text-slate-500">LOGGED:</span> 05/06 08:14</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="md:w-2/3 flex flex-col">
+                            <h3 class="text-2xl font-bold text-sky-400 mb-4 border-b border-slate-700 pb-2">5/5 樹懶公寓命案
+                            </h3>
+
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <span class="text-xs text-slate-500 block">案發時間</span>
+                                    <span class="text-sm font-medium text-slate-200">5月5日 晚間 20:00 - 21:00</span>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-slate-500 block">地點</span>
+                                    <span class="text-sm font-medium text-slate-200">樹懶高級公寓</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <span class="text-xs text-slate-500 block mb-1">案件摘要</span>
+                                <p
+                                    class="text-sm text-slate-300 leading-relaxed bg-slate-900/30 p-3 rounded border border-slate-800">
+                                    <strong
+                                        class="text-white">警方接獲報案抵達現場時，發現被害人（樹懶）倒臥於客廳地毯上，右手臂上有一枚約2公分彈孔，經檢查後確認死亡。</strong>嫌疑犯尼克已落網並坦承犯行。已尋獲作案工具，並於案發現場採集到嫌犯指紋。嫌犯自白書表示因陳年往事積怨已久而痛下殺手。
+                                </p>
+                            </div>
+
+                            <!-- 嫌疑人資料 -->
+                            <div class="mb-4">
+                                <span class="text-xs text-slate-500 block mb-1">嫌疑人資料</span>
+                                <div
+                                    class="grid grid-cols-2 gap-2 text-sm text-slate-300 bg-slate-900/30 p-3 rounded border border-slate-800">
+                                    <div><span class="text-slate-500">姓名：</span> 尼克 (Nick)</div>
+                                    <div><span class="text-slate-500">物種：</span> 赤狐</div>
+                                    <div><span class="text-slate-500">年齡：</span> 32歲</div>
+                                    <div><span class="text-slate-500">職業：</span> 冰棒推銷商/無業(過) 警察(現)</div>
+                                    <div class="col-span-2"><span class="text-slate-500">前科紀錄：</span> 逃避稅務、多起小型詐欺案</div>
+                                    <div class="col-span-2"><span class="text-slate-500">特徵：</span>
+                                        綠色夏威夷衫與棕色領帶，態度狡猾但具有異常高智商。</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto">
+                                <span class="text-xs text-slate-500 block">結案狀態</span>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></div>
+                                    <span class="text-sm font-bold text-emerald-400">局長簽核結案，嫌犯移送法辦。</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Version History Button -->
+                    <button onclick="openVersionModal()"
+                        class="absolute bottom-4 right-4 text-sm opacity-50 hover:opacity-100 transition-all bg-transparent border-none cursor-pointer">
+                        💡
+                    </button>
+                </section>
+            </template>
+
+            <!-- Generic Case Template for New Cases -->
+            <template id="tpl-result-generic">
+                <section class="glass rounded-xl p-6 border-slate-700 relative animate-[fadeIn_0.5s_ease-out]">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="md:w-1/3 flex flex-col gap-4">
+                            <div
+                                class="aspect-video bg-slate-900 rounded-lg border border-slate-700 flex items-center justify-center relative overflow-hidden group">
+                                <div class="case-img absolute inset-0 bg-slate-800 bg-cover bg-center opacity-40 mix-blend-luminosity"
+                                    style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Crime_scene_tape.jpg/640px-Crime_scene_tape.jpg')">
+                                </div>
+                                <div class="watermark-overlay absolute inset-0 z-10"></div>
+                            </div>
+                            <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-800">
+                                <h4 class="text-xs text-slate-500 uppercase tracking-wider mb-2">Metadata</h4>
+                                <ul class="text-xs text-slate-300 font-mono space-y-1">
+                                    <li><span class="text-slate-500">ID:</span> <span class="case-id"></span></li>
+                                    <li><span class="text-slate-500">CLASSIFICATION:</span> GENERAL</li>
+                                    <li><span class="text-slate-500">LOGGED:</span> SYSTEM AUTO</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="md:w-2/3 flex flex-col">
+                            <h3 class="case-title text-xl font-bold text-sky-400 mb-4 border-b border-slate-700 pb-2">
+                            </h3>
+
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <span class="text-xs text-slate-500 block">案發時間</span>
+                                    <span class="case-time text-sm font-medium text-slate-200"></span>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-slate-500 block">地點</span>
+                                    <span class="case-loc text-sm font-medium text-slate-200"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <span class="text-xs text-slate-500 block mb-1">案件摘要</span>
+                                <p
+                                    class="case-desc text-sm text-slate-300 leading-relaxed bg-slate-900/30 p-3 rounded border border-slate-800">
+                                </p>
+                            </div>
+
+                            <div class="mb-4">
+                                <span class="text-xs text-slate-500 block mb-1">嫌疑人資料</span>
+                                <div
+                                    class="grid grid-cols-2 gap-2 text-sm text-slate-300 bg-slate-900/30 p-3 rounded border border-slate-800">
+                                    <div><span class="text-slate-500">姓名：</span> <span class="susp-name"></span></div>
+                                    <div><span class="text-slate-500">物種：</span> <span class="susp-species"></span>
+                                    </div>
+                                    <div><span class="text-slate-500">年齡：</span> <span class="susp-age"></span></div>
+                                    <div><span class="text-slate-500">職業：</span> <span class="susp-job"></span></div>
+                                    <div class="col-span-2"><span class="text-slate-500">前科紀錄：</span> <span
+                                            class="susp-record"></span></div>
+                                    <div class="col-span-2"><span class="text-slate-500">特徵：</span> <span
+                                            class="susp-features"></span></div>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto">
+                                <span class="text-xs text-slate-500 block">結案狀態</span>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <div class="w-2 h-2 rounded-full bg-slate-400 shadow-[0_0_8px_#94a3b8]"></div>
+                                    <span class="case-status text-sm font-bold text-slate-300"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </template>
+
+            <!-- Internal Bulletins Section -->
+            <section id="bulletin-section" class="glass rounded-xl p-6 flex-1 shrink-0">
+                <h2 class="text-lg font-semibold mb-4 text-slate-200 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
+                        </path>
+                    </svg>
+                    內部機密通報
+                </h2>
+                <div class="space-y-3">
+                    <div onclick="playSound('girl-scream.mp3')"
+                        class="bg-slate-800/50 p-3 rounded border border-slate-700 hover:border-slate-500 transition-colors flex gap-3 cursor-pointer">
+                        <span class="text-rose-400 text-xs font-mono font-bold shrink-0 mt-0.5">[人事異動]</span>
+                        <p class="text-sm text-slate-300">4/15 茱蒂警官因重大執法疏失，榮譽一等獎撤銷公告，即日生效。</p>
+                    </div>
+                    <div onclick="playSound('woman-screaming.mp3')"
+                        class="bg-slate-800/50 p-3 rounded border border-slate-700 hover:border-slate-500 transition-colors flex gap-3 cursor-pointer">
+                        <span class="text-sky-400 text-xs font-mono font-bold shrink-0 mt-0.5">[內部通報]</span>
+                        <p class="text-sm text-slate-300">5/6 馬市長公開表揚重案組迅速偵破 5/5 高級公寓樹懶命案。</p>
+                    </div>
+                    <div onclick="playSound('scream.mp3')"
+                        class="bg-amber-900/20 p-3 rounded border border-amber-700/50 hover:border-amber-500/80 transition-colors flex gap-3 cursor-pointer">
+                        <span class="text-amber-500 text-xs font-mono font-bold shrink-0 mt-0.5">[警告]</span>
+                        <p class="text-sm text-slate-300">近期發現黑市器官交易流竄，各單位請加強夜間巡邏。</p>
+                    </div>
+                    <div onclick="playSound('alert.mp3')"
+                        class="bg-slate-800/50 p-3 rounded border border-slate-700 hover:border-slate-500 transition-colors flex gap-3 cursor-pointer">
+                        <span class="text-slate-400 text-xs font-mono font-bold shrink-0 mt-0.5">[系統公告]</span>
+                        <p class="text-sm text-slate-300">伺服器將於本週五凌晨進行安全升級。</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Right Widgets -->
+        <aside
+            class="glass hidden lg:flex flex-col w-64 border-l border-y-0 border-r-0 rounded-none shrink-0 p-4 gap-4">
+            <!-- Duty Officer Widget -->
+            <div class="bg-slate-900/50 rounded-lg p-4 border border-slate-700 cursor-pointer hover:border-sky-500/50 transition-colors group"
+                onclick="playSound('woman-screaming.mp3')">
+                <h3
+                    class="text-xs text-slate-500 group-hover:text-sky-400 transition-colors uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
+                        </path>
+                    </svg> 城市監控網段
+                </h3>
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-12 h-12 rounded bg-slate-800 border-2 border-slate-600 overflow-hidden relative group-hover:border-sky-500/50 transition-colors flex items-center justify-center">
+                        <div
+                            class="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-sky-400 to-transparent mix-blend-screen group-hover:opacity-40 animate-pulse">
+                        </div>
+                        <svg class="w-6 h-6 text-slate-500 group-hover:text-sky-400 z-10 transition-colors" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                            </path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-200 text-sm group-hover:text-sky-300 transition-colors">
+                            CAM-SQUARE-01</div>
+                        <div class="text-xs text-slate-400">撒哈拉廣場</div>
+                        <div class="text-[10px] text-emerald-400 mt-1 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-[pulse_1.5s_infinite]"></span>
+                            LIVE FEED
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status Widget -->
+            <div class="bg-slate-900/50 rounded-lg p-4 border border-slate-700 cursor-pointer hover:border-sky-500/50 transition-colors group"
+                onclick="playSound('girl-scream.mp3')">
+                <h3
+                    class="text-xs text-slate-500 group-hover:text-sky-400 transition-colors uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0">
+                        </path>
+                    </svg> 跨區通訊陣列
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-400 group-hover:text-slate-200 transition-colors">中央發射塔訊號</span>
+                            <span
+                                class="text-sky-400 font-mono group-hover:shadow-[0_0_5px_#38bdf8] transition-shadow">SECURE</span>
+                        </div>
+                        <div class="w-full h-2 flex gap-1">
+                            <div class="bg-sky-500 h-full flex-1 rounded-sm animate-[pulse_1.5s_infinite]"></div>
+                            <div class="bg-sky-500 h-full flex-1 rounded-sm animate-[pulse_1.5s_infinite_0.2s]"></div>
+                            <div class="bg-sky-500 h-full flex-1 rounded-sm animate-[pulse_1.5s_infinite_0.4s]"></div>
+                            <div class="bg-sky-500 h-full flex-1 rounded-sm animate-[pulse_1.5s_infinite_0.6s]"></div>
+                            <div class="bg-slate-700 h-full flex-1 rounded-sm"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-400 group-hover:text-slate-200 transition-colors">外部存取請求</span>
+                            <span
+                                class="text-emerald-400 font-mono group-hover:shadow-[0_0_5px_#10b981] transition-shadow">BLOCKED</span>
+                        </div>
+                        <div class="w-full h-2 flex gap-1">
+                            <div class="bg-emerald-500 h-full flex-1 rounded-sm opacity-50"></div>
+                            <div
+                                class="bg-emerald-500 h-full flex-[2] rounded-sm bg-[repeating-linear-gradient(45deg,transparent,transparent_2px,rgba(0,0,0,0.2)_2px,rgba(0,0,0,0.2)_4px)]">
+                            </div>
+                            <div class="bg-emerald-500 h-full flex-1 rounded-sm opacity-50"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-auto opacity-50">
+                <svg class="w-full h-24" preserveAspectRatio="none" viewBox="0 0 100 100">
+                    <path d="M0,50 Q25,20 50,50 T100,50 L100,100 L0,100 Z" fill="rgba(56, 189, 248, 0.05)" />
+                    <path d="M0,60 Q25,80 50,60 T100,60 L100,100 L0,100 Z" fill="rgba(56, 189, 248, 0.05)" />
+                    <path d="M0,70 Q25,50 50,70 T100,70 L100,100 L0,100 Z" fill="rgba(56, 189, 248, 0.05)" />
+                </svg>
+            </div>
+        </aside>
+    </div>
+
+    <!-- System Update Notification -->
+    <div id="update-notification"
+        class="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-md hidden">
+        <div
+            class="glass rounded-xl p-8 max-w-sm w-full border-sky-500/50 relative shadow-[0_0_15px_rgba(56,189,248,0.3)]">
+            <button onclick="closeSystemUpdateNotification()"
+                class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+            <h3 class="text-xl font-bold text-sky-400 mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                系統更新
+            </h3>
+            <div class="text-slate-300 text-sm space-y-2">
+                <p>ZPD 系統已完成最新版本升級。</p>
+                <div class="bg-sky-900/30 p-3 rounded border border-sky-800/50 mt-4">
+                    <span class="text-sky-400 font-bold block mb-1">【更新內容】</span>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>優化生物辨識登入模組（已修正角鼻龍無法掃描鼻紋之問題）</li>
+                        <li>強化各分局跨區連線加密協定至 AES-512</li>
+                        <li>修復夜間模式下「紅蘿蔔農場地圖」顯示異常的 Bug</li>
+                    </ul>
+                </div>
+            </div>
+            <button onclick="closeSystemUpdateNotification()"
+                class="w-full mt-6 bg-sky-900/50 text-sky-300 border border-sky-800 py-2 rounded hover:bg-sky-800 hover:text-white transition-colors uppercase text-sm font-bold tracking-widest">
+                確認
+            </button>
+        </div>
+    </div>
+
+    <!-- Version Modal / Decryption -->
+    <div id="version-modal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-md hidden overflow-hidden">
+
+        <!-- Global Matrix Background (covers screen outside modal) -->
+        <div id="global-matrix-bg"
+            class="hidden absolute inset-0 z-0 overflow-hidden text-green-500/40 font-mono text-sm break-all leading-none pointer-events-none flex flex-wrap content-start">
+        </div>
+
+        <div id="modal-content"
+            class="glass rounded-xl p-8 max-w-md w-full border-slate-600 relative overflow-hidden z-10">
+            <!-- Matrix Background (covers entire modal) -->
+            <div id="matrix-bg"
+                class="hidden absolute inset-0 z-0 overflow-hidden text-red-600/40 font-mono text-sm break-all leading-none pointer-events-none flex flex-wrap content-start bg-black opacity-80">
+            </div>
+
+            <div id="decryption-step" class="relative z-10">
+                <h3 class="text-xl font-bold text-slate-200 mb-2 font-mono">ENCRYPTED ARCHIVE ACCESS</h3>
+                <p class="text-xs text-rose-400 mb-6 font-mono">RESTRICTED TO LEVEL 5 OMEGA CLEARANCE.</p>
+
+                <div class="mb-4">
+                    <label class="block text-xs text-slate-400 mb-2 uppercase tracking-widest">最高權限解密密碼</label>
+                    <div class="relative w-full">
+                        <input type="password" id="modal-password"
+                            class="w-full bg-black border border-rose-900 text-rose-500 px-4 py-3 rounded focus:outline-none focus:border-rose-500 font-mono tracking-[0.5em] text-center"
+                            autocomplete="off">
+                        <button id="modal-eye-btn" class="absolute right-3 top-1/2 transform -translate-y-1/2 focus:outline-none text-rose-500 hover:text-rose-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                <p id="modal-error" class="text-rose-500 text-xs mb-4 min-h-[16px] text-center font-mono"></p>
+
+                <div class="flex gap-4">
+                    <button onclick="closeVersionModal()"
+                        class="flex-1 bg-slate-800 text-slate-300 py-2 rounded hover:bg-slate-700 transition-colors uppercase text-sm font-bold">Cancel</button>
+                    <button onclick="attemptDecrypt()"
+                        class="flex-1 bg-rose-900/50 text-rose-300 border border-rose-800 py-2 rounded hover:bg-rose-800 hover:text-white transition-colors uppercase text-sm font-bold">Decrypt</button>
+                </div>
+            </div>
+
+            <div id="truth-step" class="hidden h-[60vh] w-full relative z-10">
+
+                <div class="flex flex-col h-full w-full relative z-10">
+                    <div
+                        class="relative z-10 flex-1 overflow-y-auto pr-2 space-y-4 font-sans text-sm pb-4 scrollbar-red">
+                        <!-- Mayor -->
+                        <div class="flex justify-start gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-red-600 border-2 border-red-400 shrink-0 shadow-[0_0_15px_rgba(255,0,0,0.8)]">
+                            </div>
+                            <div
+                                class="bg-red-950/80 backdrop-blur-md border-2 border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)] rounded-lg rounded-tl-none px-4 py-3 max-w-[80%] text-red-50 font-bold text-base tracking-wide glow-text-red">
+                                樹懶命案的調查進度到哪了？媒體已經快把市府的電話打爆了。
+                            </div>
+                        </div>
+                        <!-- Chief -->
+                        <div class="flex justify-end gap-3">
+                            <div
+                                class="bg-rose-950/80 backdrop-blur-md border-2 border-rose-500 shadow-[0_0_20px_rgba(255,0,50,0.6)] rounded-lg rounded-tr-none px-4 py-3 max-w-[80%] text-rose-50 font-bold text-base tracking-wide glow-text-red">
+                                專案小組還在釐清幾處關鍵疑點，目前正準備調閱監視器畫面，需要一點時間。
+                            </div>
+                            <div
+                                class="w-8 h-8 rounded-full bg-rose-600 border-2 border-rose-400 shrink-0 shadow-[0_0_15px_rgba(255,0,50,0.8)]">
+                            </div>
+                        </div>
+                        <!-- Mayor -->
+                        <div class="flex justify-start gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-red-600 border-2 border-red-400 shrink-0 shadow-[0_0_15px_rgba(255,0,0,0.8)]">
+                            </div>
+                            <div
+                                class="bg-red-950/80 backdrop-blur-md border-2 border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)] rounded-lg rounded-tl-none px-4 py-3 max-w-[80%] text-red-50 font-bold text-base tracking-wide glow-text-red">
+                                不要浪費時間去查那些無關緊要的東西了。我直接跟你交個底：殺害樹懶的兇手就是尼克。
+                            </div>
+                        </div>
+                        <!-- Chief -->
+                        <div class="flex justify-end gap-3">
+                            <div
+                                class="bg-rose-950/80 backdrop-blur-md border-2 border-rose-500 shadow-[0_0_20px_rgba(255,0,50,0.6)] rounded-lg rounded-tr-none px-4 py-3 max-w-[80%] text-rose-50 font-bold text-base tracking-wide glow-text-red">
+                                尼克？可是目前的現場證據並不足以直接將他定罪，如果現在就草率結案……
+                            </div>
+                            <div
+                                class="w-8 h-8 rounded-full bg-rose-600 border-2 border-rose-400 shrink-0 shadow-[0_0_15px_rgba(255,0,50,0.8)]">
+                            </div>
+                        </div>
+                        <!-- Mayor -->
+                        <div class="flex justify-start gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-red-600 border-2 border-red-400 shrink-0 shadow-[0_0_15px_rgba(255,0,0,0.8)]">
+                            </div>
+                            <div
+                                class="bg-red-950/80 backdrop-blur-md border-2 border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)] rounded-lg rounded-tl-none px-4 py-3 max-w-[80%] text-red-50 font-bold text-base tracking-wide glow-text-red">
+                                這不是草率，是顧全大局。你必須立刻以尼克為兇手快速結案。
+                            </div>
+                        </div>
+                        <!-- Mayor -->
+                        <div class="flex justify-start gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-red-600 border-2 border-red-400 shrink-0 shadow-[0_0_15px_rgba(255,0,0,0.8)]">
+                            </div>
+                            <div
+                                class="bg-red-950/80 backdrop-blur-md border-2 border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)] rounded-lg rounded-tl-none px-4 py-3 max-w-[80%] text-red-50 font-bold text-base tracking-wide glow-text-red">
+                                聽著，警政署長的位子下個月就要空出來了。只要這件案子能乾淨俐落地解決，我會親自出面，全力舉薦你出任署長。以你的資歷，加上這份破案功勞，這位置非你莫屬。
+                            </div>
+                        </div>
+                        <!-- Chief -->
+                        <div class="flex justify-end gap-3">
+                            <div
+                                class="bg-rose-950/80 backdrop-blur-md border-2 border-rose-500 shadow-[0_0_20px_rgba(255,0,50,0.6)] rounded-lg rounded-tr-none px-4 py-3 max-w-[80%] text-rose-50 font-bold text-base tracking-wide glow-text-red">
+                                但這不符合乎警方的辦案程序...
+                            </div>
+                            <div
+                                class="w-8 h-8 rounded-full bg-rose-600 border-2 border-rose-400 shrink-0 shadow-[0_0_15px_rgba(255,0,50,0.8)]">
+                            </div>
+                        </div>
+                        <!-- Mayor -->
+                        <div class="flex justify-start gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-red-600 border-2 border-red-400 shrink-0 shadow-[0_0_15px_rgba(255,0,0,0.8)]">
+                            </div>
+                            <div
+                                class="bg-red-950/80 backdrop-blur-md border-2 border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)] rounded-lg rounded-tl-none px-4 py-3 max-w-[80%] text-red-50 font-bold text-base tracking-wide glow-text-red">
+                                程序是死的人是活的。你以為我這麼要求是為了誰？案子拖得越久，茱蒂就越危險，你難道想看到那隻兔子出事嗎？快速結案不只是為了保護茱蒂，更是為了保護你們警局岌岌可危的名譽！再拖下去，市民對警方的信任就要徹底破產了。
+                            </div>
+                        </div>
+                        <!-- Mayor -->
+                        <div class="flex justify-start gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-red-600 border-2 border-red-400 shrink-0 shadow-[0_0_15px_rgba(255,0,0,0.8)]">
+                            </div>
+                            <div
+                                class="bg-red-950/80 backdrop-blur-md border-2 border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)] rounded-lg rounded-tl-none px-4 py-3 max-w-[80%] text-red-50 font-bold text-base tracking-wide glow-text-red">
+                                我是個念舊情的人，所以才把高升的機會留給你。但如果你還是堅持要用你的「程序」來辦事，那市府這邊恐怕很難再給警局更多的支持了。你最近應該已經深刻感受到，議會審查警局預算和人事編制時有多「嚴格」了吧？
+                            </div>
+                        </div>
+                        <!-- Mayor -->
+                        <div class="flex justify-start gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-red-600 border-2 border-red-400 shrink-0 shadow-[0_0_15px_rgba(255,0,0,0.8)]">
+                            </div>
+                            <div
+                                class="bg-red-950/80 backdrop-blur-md border-2 border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)] rounded-lg rounded-tl-none px-4 py-3 max-w-[80%] text-red-50 font-bold text-base tracking-wide glow-text-red">
+                                我不希望我們未來的溝通，還得繼續面臨這種處處受限的狀況。你明白我的意思嗎？
+                            </div>
+                        </div>
+                        <!-- Chief -->
+                        <div class="flex justify-end gap-3">
+                            <div
+                                class="bg-rose-950/80 backdrop-blur-md border-2 border-rose-500 shadow-[0_0_20px_rgba(255,0,50,0.6)] rounded-lg rounded-tr-none px-4 py-3 max-w-[80%] text-rose-50 font-bold text-base tracking-wide glow-text-red">
+                                ……
+                            </div>
+                            <div
+                                class="w-8 h-8 rounded-full bg-rose-600 border-2 border-rose-400 shrink-0 shadow-[0_0_15px_rgba(255,0,50,0.8)]">
+                            </div>
+                        </div>
+                        <!-- Chief -->
+                        <div class="flex justify-end gap-3">
+                            <div
+                                class="bg-rose-950/80 backdrop-blur-md border-2 border-rose-500 shadow-[0_0_20px_rgba(255,0,50,0.6)] rounded-lg rounded-tr-none px-4 py-3 max-w-[80%] text-rose-50 font-bold text-base tracking-wide glow-text-red">
+                                我明白了。
+                            </div>
+                            <div
+                                class="w-8 h-8 rounded-full bg-rose-600 border-2 border-rose-400 shrink-0 shadow-[0_0_15px_rgba(255,0,50,0.8)]">
+                            </div>
+                        </div>
+                        <!-- Chief -->
+                        <div class="flex justify-end gap-3">
+                            <div
+                                class="bg-rose-950/80 backdrop-blur-md border-2 border-rose-500 shadow-[0_0_20px_rgba(255,0,50,0.6)] rounded-lg rounded-tr-none px-4 py-3 max-w-[80%] text-rose-50 font-bold text-base tracking-wide glow-text-red">
+                                我會指示下面的人調整偵辦方向。明天早上，警局就會召開記者會，宣布偵破樹懶命案，主嫌為尼克，全案移送法辦。
+                            </div>
+                            <div
+                                class="w-8 h-8 rounded-full bg-rose-600 border-2 border-rose-400 shrink-0 shadow-[0_0_15px_rgba(255,0,50,0.8)]">
+                            </div>
+                        </div>
+                        <!-- Mayor -->
+                        <div class="flex justify-start gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-red-600 border-2 border-red-400 shrink-0 shadow-[0_0_15px_rgba(255,0,0,0.8)]">
+                            </div>
+                            <div
+                                class="bg-red-950/80 backdrop-blur-md border-2 border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)] rounded-lg rounded-tl-none px-4 py-3 max-w-[80%] text-red-50 font-bold text-base tracking-wide glow-text-red">
+                                明智的決定。我會好好期待明天的好消息。
+                            </div>
+                        </div>
+                        <!-- Mayor -->
+                        <div class="flex justify-start gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-red-600 border-2 border-red-400 shrink-0 shadow-[0_0_15px_rgba(255,0,0,0.8)]">
+                            </div>
+                            <div
+                                class="bg-red-950/80 backdrop-blur-md border-2 border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.6)] rounded-lg rounded-tl-none px-4 py-3 max-w-[80%] text-red-50 font-bold text-base tracking-wide glow-text-red">
+                                我未來的署長。
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative z-10 shrink-0 mt-4">
+                        <button onclick="closeVersionModal()"
+                            class="w-full bg-red-700 text-white py-2 rounded border-2 border-red-500 shadow-[0_0_15px_rgba(255,0,0,0.8)] hover:bg-red-600 hover:shadow-[0_0_25px_rgba(255,0,0,1)] transition-all uppercase text-sm font-bold font-mono tracking-widest">CLOSE</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        // Accounts Data
+        const ACCOUNTS = {
+            "commissioner.bogo@zpd.gov": { strPass: "BOSSLIES", name: "公牛局長", level: 5 },
+            "officer.judy@zpd.gov": { strPass: "Carrot01", name: "基層警員 (Judy)", level: 2 },
+            "officer.clawhauser@zpd.gov": { strPass: "Donut123", name: "基層警員 (Clawhauser)", level: 2 },
+            "officer.fangmeyer@zpd.gov": { strPass: "TigerTough789", name: "基層警員 (Fangmeyer)", level: 2 },
+            "detective.mchorn@zpd.gov": { strPass: "Rhino555", name: "基層警員 (McHorn)", level: 2 },
+            "officer.delgato@zpd.gov": { strPass: "Lion007", name: "基層警員 (Delgato)", level: 2 },
+            "dev": { strPass: "dev", name: "DEV ADMIN", level: 5 }, // For easy testing, remove in prod if needed, keeping just in case
+            "im": { strPass: "im", name: "IM ADMIN", level: 5 }
+        };
+
+        const SECRETS = {
+            TRUTH_MODAL_PASS: "09192026",
+            TARGET_CASE: "CASE73926481"
+        };
+
+        const CASE_DB = {
+            "CASE58291047": {
+                tit: "【極度危險載具改裝與超速案】",
+                time: "5月1日 14:20", loc: "撒哈拉廣場 101 高速公路",
+                desc: "交通大隊於昨日下午測得一輛未登記載具以時速 160 公里的速度狂飆，甚至超車了正在追捕搶匪的獵豹警官。警方設立路障將其攔下後，發現駕駛竟是一隻年邁的烏龜。嫌疑犯將一台工業級落葉吹風機改裝並綁在自己的滑板上，試圖締造「爬蟲類陸地最速傳說」。",
+                status: "罰款繳納中，載具已被依法沒收（並送交消防局研究）。",
+                suspect: { name: "托比 (Toby)", species: "蘇卡達象龜", age: "85歲", job: "退休航太工程師", record: "多次非法改裝輪椅、將噴射引擎安裝於超市推車上。", features: "龜殼上貼滿了「火焰」與「閃電」的改裝車貼紙。" },
+                img: "image/toby.png"
+            },
+            "CASE63918274": {
+                tit: "【超大型農產品竊盜案】",
+                time: "4月25日 03:30", loc: "兔窩鎮 羅素農場",
+                desc: "農場主人報案指出，倉庫內高達 500 公斤的特級胡蘿蔔在一夜之間不翼而飛。現場沒有破壞痕跡，但監視器拍到令人震驚的畫面：一支由約 50 隻倉鼠組成的「戰術小隊」，利用極細的溜索、滑輪組與迷你起重機，將胡蘿蔔一根根空投運走。行動極度安靜且組織嚴密。",
+                status: "擴大偵查中（警方已在周邊部署大量特級葵花子作為誘餌）。",
+                suspect: { name: "胖頰 (Cheeks) (主嫌)", species: "黃金鼠", age: "2歲半", job: "健身教練 / 地下幫派「頰囊幫」首領", record: "組織犯罪、走私堅果。", features: "臉頰彈性極佳，警方懷疑他將部分贓物直接藏在雙頰內，導致他目前頭部看起來比身体大三倍。" },
+                img: "image/hamsters.png"
+            },
+            "CASE27485910": {
+                tit: "【非法深夜廣播與集體妨礙安寧案】",
+                time: "4月28日 02:00", loc: "狼樹林 嚎叫公寓頂樓",
+                desc: "警方接獲數十起投訴，表示狼樹林社區發生大規模、具傳染性的「狼嚎暴動」，導致周邊社區的狗類市民也跟著失控。警方攻堅頂樓後，當場逮捕正在進行未經授權之「深夜 ASMR 靈魂探討廣播」的嫌犯。嫌犯辯稱他只是在對著麥克風進行「低頻情緒釋放」，沒想到會引發全區物種的原始本能共鳴。",
+                status: "設備已查扣，嫌疑犯被判處社區勞動。",
+                suspect: { name: "蓋瑞 (Gary)", species: "森林狼", age: "32歲", job: "獨立 Podcast 主持人 / 業餘哲學家", record: "曾在滿月時於市立圖書館大叫而被開出拘票。", features: "隨身攜帶高級麥克風，說話聲音極度低沉且充滿磁性。" },
+                img: "image/wolf.png"
+            },
+            "CASE81930472": {
+                tit: "【「國王的新衣」精品詐欺案】",
+                time: "5月3日 16:45", loc: "凍土城 冰川大道名品街",
+                desc: "嫌犯在高級商業區兜售號稱「100% 隱形、零碳足跡、純意識流設計」的頂級限量名牌包。多名上流社會的綿羊與貴賓狗受騙上當，花費鉅資購買了「一團空氣」。嫌犯被捕後，利用自身變色保護色能力，在偵訊室與牆壁融為一體，趁員警不注意時溜出門外。",
+                status: "嫌犯逃逸中（警方目前正在看守所內灑麵粉搜捕）。",
+                suspect: { name: "卡米爾 (Camille)", species: "變色龍", age: "28歲", job: "前衛藝術家 / 詐欺慣犯", record: "偽造文書（因為印章顏色總是蓋錯而穿幫）。", features: "一緊張就會不受控制地變成棋盤格圖案。" },
+                img: "image/lizard.png"
+            },
+            "CASE91028346": {
+                tit: "【大規模毀滅性甜點引發之公共危險案】",
+                time: "5月4日 09:15", loc: "市中心與鼠輩城交界處",
+                desc: "嫌犯於市中心購買了一顆巨無霸糖霜甜甜圈，邊走邊吃時不慎手滑，甜甜圈滾入微型的「鼠輩城」區域。對小型囓齒動物而言，這顆甜甜圈猶如一顆「隕石」砸落街道。更嚴重的是，大量散落的糖霜導致鼠輩城市民引發集體「糖分亢奮（Sugar Rush）」，造成嚴重的交通癱瘓。嫌犯試圖用象鼻將甜甜圈吸回來，卻不小心把兩輛鼠輩城的警車一起吸了進去。",
+                status: "賠償和解中。",
+                suspect: { name: "艾爾 (Al)", species: "非洲象", age: "45歲", job: "甜點品鑑師", record: "無。但有嚴重的糖分成癮症醫學紀錄。", features: "隨身攜帶特大號手帕，對於破壞鼠輩城感到極度自責，偵訊時哭了三個小時，淚水差點淹沒警局一樓。" },
+                img: "image/elephant.png"
+            }
+        };
+
+        // State
+        let currentUser = null;
+        let loginAttempts = 0;
+        let lockoutEndTime = 0;
+        let decryptAttempts = 0;
+        let decryptLockoutEndTime = 0;
+
+        // Elements
+        const elJumpscare = document.getElementById('jumpscare-container');
+        const defaultShakeTarget = document.body;
+
+        // Clock Update
+        setInterval(() => {
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            document.getElementById('header-time').textContent = timeStr;
+        }, 1000);
+
+        // Security / Navigation Functions
+        function checkLockout() {
+            if (Date.now() < lockoutEndTime) {
+                const remain = Math.ceil((lockoutEndTime - Date.now()) / 1000);
+                document.getElementById('login-username').disabled = true;
+                document.getElementById('login-password').disabled = true;
+                document.getElementById('login-btn').disabled = true;
+                document.getElementById('lockout-timer').classList.remove('hidden');
+                document.getElementById('lockout-timer').textContent = `SYSTEM LOCKED. COOLDOWN: ${remain}s`;
+                setTimeout(checkLockout, 1000);
+                return true;
+            } else if (lockoutEndTime > 0) {
+                // Lockout expired
+                lockoutEndTime = 0;
+                loginAttempts = 0;
+                document.getElementById('login-username').disabled = false;
+                document.getElementById('login-password').disabled = false;
+                document.getElementById('login-btn').disabled = false;
+                document.getElementById('lockout-timer').classList.add('hidden');
+                document.getElementById('login-error').textContent = '';
+                return false;
+            }
+            return false;
+        }
+
+        function checkDecryptLockout() {
+            if (Date.now() < decryptLockoutEndTime) {
+                const remain = Math.ceil((decryptLockoutEndTime - Date.now()) / 1000);
+                document.getElementById('modal-password').disabled = true;
+                document.getElementById('modal-error').textContent = `SYSTEM LOCKED. COOLDOWN: ${remain}s`;
+                setTimeout(checkDecryptLockout, 1000);
+                return true;
+            } else if (decryptLockoutEndTime > 0) {
+                // Lockout expired
+                decryptLockoutEndTime = 0;
+                decryptAttempts = 0;
+                document.getElementById('modal-password').disabled = false;
+                document.getElementById('modal-error').textContent = '';
+                return false;
+            }
+            return false;
+        }
+
+        // Dynamic Audio Player for UI interactions
+        function playSound(filename) {
+            const audio = new Audio('audio/' + filename);
+            if (filename === 'failed.mp3') {
+                audio.currentTime = 1;
+            }
+            audio.play().catch(e => console.log(e));
+
+            // Limit audio playback to exactly 5 seconds
+            setTimeout(() => {
+                audio.pause();
+                audio.currentTime = 0;
+            }, 5000);
+        }
+
+        function triggerJumpscare() {
+            elJumpscare.style.display = 'block';
+            defaultShakeTarget.classList.add('shake');
+
+            // Fill bg text
+            const bgTextEl = document.getElementById('jumpscare-bg-text');
+            bgTextEl.innerHTML = 'Warning! '.repeat(500);
+
+            // Fetch audio elements
+            const audFailed = document.getElementById('audio-failed');
+            const audRiser = document.getElementById('audio-riser');
+            const audScream = document.getElementById('audio-scream');
+
+            // Set start time to 1 second
+            if (audFailed) {
+                audFailed.volume = 1.0;
+                audFailed.currentTime = 1;
+            }
+            if (audRiser) {
+                audRiser.volume = 1.0;
+                audRiser.currentTime = 1;
+            }
+            if (audScream) {
+                audScream.volume = 1.0;
+                audScream.currentTime = 1;
+            }
+
+            // Short one loops
+            if (audScream) audScream.loop = true;
+
+            // Play all
+            if (audFailed) audFailed.play().catch(e => console.log(e));
+            if (audRiser) audRiser.play().catch(e => console.log(e));
+            if (audScream) audScream.play().catch(e => console.log(e));
+
+            let isResolved = false;
+
+            const cleanup = () => {
+                if (isResolved) return;
+                isResolved = true;
+                if (audFailed) { audFailed.pause(); audFailed.currentTime = 0; }
+                if (audRiser) { audRiser.pause(); audRiser.currentTime = 0; }
+                if (audScream) { audScream.pause(); audScream.currentTime = 0; audScream.loop = false; }
+                elJumpscare.style.display = 'none';
+                defaultShakeTarget.classList.remove('shake');
+            };
+
+            // Stop after 2 seconds as requested
+            setTimeout(cleanup, 2000);
+        }
+
+        function handleLoginFailure() {
+            loginAttempts++;
+            triggerJumpscare();
+
+            document.getElementById('login-error').innerHTML = `INVALID CREDENTIALS.<br>ATTEMPT ${loginAttempts}/3<br>(提示: 注意英文大小寫)`;
+
+            if (loginAttempts >= 3) {
+                lockoutEndTime = Date.now() + (30 * 1000); // 30 seconds
+                checkLockout();
+            }
+            document.getElementById('login-password').value = '';
+        }
+
+        function attemptLogin() {
+            if (checkLockout()) return;
+
+            const user = document.getElementById('login-username').value.trim().toLowerCase();
+            const passEl = document.getElementById('login-password');
+            const pass = passEl.dataset.realValue !== undefined ? passEl.dataset.realValue : passEl.value;
+
+            if (ACCOUNTS[user] && ACCOUNTS[user].strPass === pass) {
+                // Success
+                currentUser = ACCOUNTS[user];
+                loginAttempts = 0;
+
+                // Update UI
+                document.getElementById('user-display-name').textContent = currentUser.name;
+                document.getElementById('user-display-level').textContent = `LEVEL ${currentUser.level}`;
+                if (currentUser.level >= 5) {
+                    document.getElementById('user-display-level').className = "text-xs text-sky-400 font-mono bg-sky-950/50 px-2 rounded mt-1 border border-sky-900";
+                } else {
+                    document.getElementById('user-display-level').className = "text-xs text-rose-400 font-mono bg-rose-950/50 px-2 rounded mt-1 border border-rose-900";
+                }
+
+                // Hide login, reset query
+                document.getElementById('login-screen').classList.add('hidden');
+                resetViews();
+
+                showSystemUpdateNotification();
+            } else {
+                handleLoginFailure();
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-error').textContent = '';
+            document.getElementById('login-screen').classList.remove('hidden');
+            resetViews();
+        }
+
+        // Query App Logic
+        function handleQuery() {
+            const input = document.getElementById('case-search-input').value.trim().toUpperCase();
+            const errEl = document.getElementById('query-error');
+            const resContainer = document.getElementById('query-result-container');
+            const bulletinSec = document.getElementById('bulletin-section');
+            const backNav = document.getElementById('back-nav');
+
+            errEl.classList.add('hidden');
+            resContainer.innerHTML = '';
+            resContainer.classList.add('hidden');
+
+            if (input === '') return;
+
+            if (input === SECRETS.TARGET_CASE) {
+                // Hide bulletins, show results
+                bulletinSec.classList.add('hidden');
+                resContainer.classList.remove('hidden');
+                backNav.classList.remove('hidden');
+
+                if (currentUser.level >= 5) {
+                    const tpl = document.getElementById('tpl-result-lvl5');
+                    resContainer.appendChild(tpl.content.cloneNode(true));
+                } else {
+                    const tpl = document.getElementById('tpl-result-lvl2');
+                    resContainer.appendChild(tpl.content.cloneNode(true));
+                }
+            } else if (CASE_DB[input]) {
+                bulletinSec.classList.add('hidden');
+                resContainer.classList.remove('hidden');
+                backNav.classList.remove('hidden');
+
+                const tpl = document.getElementById('tpl-result-generic');
+                const clone = tpl.content.cloneNode(true);
+                const data = CASE_DB[input];
+
+                clone.querySelector('.case-id').textContent = input;
+                clone.querySelector('.case-title').textContent = data.tit;
+                clone.querySelector('.case-time').textContent = data.time;
+                clone.querySelector('.case-loc').textContent = data.loc;
+                clone.querySelector('.case-desc').textContent = data.desc;
+                clone.querySelector('.case-status').textContent = data.status;
+                if (data.img) {
+                    clone.querySelector('.case-img').style.backgroundImage = `url('${data.img}')`;
+                    clone.querySelector('.case-img').classList.remove('opacity-40', 'mix-blend-luminosity');
+                }
+
+                clone.querySelector('.susp-name').textContent = data.suspect.name;
+                clone.querySelector('.susp-species').textContent = data.suspect.species;
+                clone.querySelector('.susp-age').textContent = data.suspect.age;
+                clone.querySelector('.susp-job').textContent = data.suspect.job;
+                clone.querySelector('.susp-record').textContent = data.suspect.record;
+                clone.querySelector('.susp-features').textContent = data.suspect.features;
+
+                resContainer.appendChild(clone);
+            } else {
+                errEl.textContent = "RECORD NOT FOUND OR ACCESS DENIED.";
+                errEl.classList.remove('hidden');
+                triggerJumpscare(); // Optional: punishment for wrong query? The prompt didn't specify jumpscare for query, so I'll leave it without jumpscare. Wait! Prompt says "密碼輸入錯誤時... Jumpscare". Case query is not password. I will not jumpscare here.
+            }
+        }
+
+        function resetViews() {
+            document.getElementById('case-search-input').value = '';
+            document.getElementById('query-error').classList.add('hidden');
+            document.getElementById('query-result-container').innerHTML = '';
+            document.getElementById('query-result-container').classList.add('hidden');
+            document.getElementById('bulletin-section').classList.remove('hidden');
+            document.getElementById('back-nav').classList.add('hidden');
+            closeVersionModal();
+        }
+
+        // Modal Logic
+        function openVersionModal() {
+            document.getElementById('version-modal').classList.remove('hidden');
+            document.getElementById('decryption-step').classList.remove('hidden');
+            document.getElementById('truth-step').classList.add('hidden');
+            document.getElementById('modal-password').value = '';
+            document.getElementById('modal-error').textContent = '';
+            document.getElementById('modal-content').classList.remove('glitch-bg');
+            document.getElementById('modal-password').focus();
+            if (document.getElementById('matrix-bg')) {
+                document.getElementById('matrix-bg').classList.add('hidden');
+            }
+            if (document.getElementById('global-matrix-bg')) {
+                document.getElementById('global-matrix-bg').classList.add('hidden');
+            }
+            checkDecryptLockout();
+        }
+
+        function showSystemUpdateNotification() {
+            document.getElementById('update-notification').classList.remove('hidden');
+        }
+
+        function closeSystemUpdateNotification() {
+            document.getElementById('update-notification').classList.add('hidden');
+        }
+
+        function closeVersionModal() {
+            document.getElementById('version-modal').classList.add('hidden');
+            if (window.successAudio) {
+                window.successAudio.pause();
+                window.successAudio.loop = false;
+            }
+            if (window.matrixInterval) {
+                clearInterval(window.matrixInterval);
+                window.matrixInterval = null;
+            }
+            if (window.globalMatrixInterval) {
+                clearInterval(window.globalMatrixInterval);
+                window.globalMatrixInterval = null;
+            }
+            document.getElementById('modal-content').classList.add('glass');
+            document.getElementById('modal-content').classList.remove('bg-black', 'glitch-shake');
+        }
+
+        function attemptDecrypt() {
+            if (checkDecryptLockout()) return;
+
+            const passEl = document.getElementById('modal-password');
+            const pass = passEl.dataset.realValue !== undefined ? passEl.dataset.realValue : passEl.value;
+            if (pass === SECRETS.TRUTH_MODAL_PASS) {
+                // Success revealing truth
+                decryptAttempts = 0;
+                document.getElementById('decryption-step').classList.add('hidden');
+                document.getElementById('truth-step').classList.remove('hidden');
+
+                // Play success track looping until closed (using internal alert, since failed is needed for errors)
+                // Need to dynamically create to not conflict with failed
+                if (!window.successAudio) {
+                    window.successAudio = new Audio('audio/alert.mp3');
+                    window.successAudio.addEventListener('ended', function () {
+                        this.currentTime = 1;
+                        this.play();
+                    });
+                }
+                window.successAudio.volume = 1.0;
+                window.successAudio.currentTime = 1; // Play from 1st second
+                window.successAudio.loop = false; // Relies on ended event to loop from 1s
+                window.successAudio.play().catch(e => console.log(e));
+
+                // Start random matrix text for inner dialog
+                if (!window.matrixInterval) {
+                    const matrixEl = document.getElementById('matrix-bg');
+                    if (matrixEl) matrixEl.classList.remove('hidden');
+                    window.matrixInterval = setInterval(() => {
+                        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?/\\';
+                        let text = '';
+                        for (let i = 0; i < 4000; i++) {
+                            text += chars.charAt(Math.floor(Math.random() * chars.length));
+                        }
+                        if (matrixEl) matrixEl.textContent = text;
+                    }, 50);
+                }
+
+                // Start global random matrix text (same style but green)
+                if (!window.globalMatrixInterval) {
+                    const globalMatrixEl = document.getElementById('global-matrix-bg');
+                    if (globalMatrixEl) globalMatrixEl.classList.remove('hidden');
+                    window.globalMatrixInterval = setInterval(() => {
+                        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?/\\';
+                        let text = '';
+                        for (let i = 0; i < 15000; i++) {
+                            text += chars.charAt(Math.floor(Math.random() * chars.length));
+                        }
+                        if (globalMatrixEl) globalMatrixEl.textContent = text;
+                    }, 100);
+                }
+
+                // Add Glitch visual to modal background
+                document.getElementById('modal-content').classList.remove('glass');
+                document.getElementById('modal-content').classList.add('bg-black', 'glitch-shake');
+                document.body.classList.add('shake');
+                setTimeout(() => { document.body.classList.remove('shake'); }, 300);
+
+            } else {
+                // Error - Jumpscare inside modal context
+                decryptAttempts++;
+                triggerJumpscare();
+
+                document.getElementById('modal-error').textContent = `ACCESS DENIED. INCORRECT KEY. ATTEMPT ${decryptAttempts}/3`;
+
+                if (decryptAttempts >= 3) {
+                    decryptLockoutEndTime = Date.now() + (30 * 1000); // 30 seconds
+                    checkDecryptLockout();
+                }
+                document.getElementById('modal-password').value = '';
+            }
+        }
+
+        // Listeners for Enter keys
+        document.getElementById('login-password').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') attemptLogin();
+        });
+        document.getElementById('case-search-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') handleQuery();
+        });
+        document.getElementById('modal-password').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') attemptDecrypt();
+        });
+
+        function setupPasswordField(inputId, btnId) {
+            const input = document.getElementById(inputId);
+            const btn = document.getElementById(btnId);
+            let timeoutId = null;
+            let isEyeOpen = false;
+            let realValue = "";
+
+            const SVG_EYE_OPEN = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>`;
+            const SVG_EYE_CLOSED = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>`;
+
+            input.type = 'text';
+            btn.innerHTML = SVG_EYE_CLOSED;
+
+            setInterval(() => {
+                if (input.value === "") {
+                    realValue = "";
+                    input.dataset.realValue = "";
+                }
+            }, 100);
+
+            input.addEventListener('input', (e) => {
+                if (isEyeOpen) {
+                    realValue = input.value;
+                    input.dataset.realValue = realValue;
+                    return;
+                }
+
+                if (input.value === "") {
+                    realValue = "";
+                    input.dataset.realValue = "";
+                    return;
+                }
+
+                const currentVal = input.value;
+                const lastChar = currentVal.slice(-1);
+                
+                if (currentVal.length < realValue.length) {
+                    realValue = realValue.slice(0, currentVal.length);
+                } else if (currentVal.length > realValue.length) {
+                    realValue += currentVal.slice(realValue.length);
+                } else {
+                    if (lastChar !== '•') {
+                        realValue = realValue.slice(0, -1) + lastChar;
+                    }
+                }
+                
+                input.dataset.realValue = realValue;
+
+                input.value = "•".repeat(realValue.length - 1) + realValue.slice(-1);
+                
+                if (timeoutId) clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    if (!isEyeOpen) {
+                        input.value = "•".repeat(realValue.length);
+                    }
+                }, 1000);
+            });
+
+            btn.addEventListener('click', () => {
+                isEyeOpen = !isEyeOpen;
+                btn.innerHTML = isEyeOpen ? SVG_EYE_OPEN : SVG_EYE_CLOSED;
+                if (isEyeOpen) {
+                    input.value = realValue;
+                } else {
+                    input.value = "•".repeat(realValue.length);
+                }
+            });
+        }
+
+        setupPasswordField('login-password', 'login-eye-btn');
+        setupPasswordField('modal-password', 'modal-eye-btn');
+
+    </script>
+</body>
+
+</html>
